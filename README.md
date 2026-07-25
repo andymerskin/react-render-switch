@@ -1,6 +1,6 @@
 # react-render-switch
 
-Switch-style UI branching for React components. Define named cases with a `test` and `render` via `createRenderSwitch`, or use the `<RenderSwitch>` component for the common async loading/error/empty/ready pattern.
+Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<RenderSwitch>` for the common loading / error / empty / ready pattern.
 
 ## Install
 
@@ -10,87 +10,87 @@ bun add react-render-switch
 
 Requires React 18+ as a peer dependency.
 
-## Develop
+## Usage
 
-```bash
-bun install
-bun run build
-bun test
-bun run example:factory
-bun run example:component
-```
+### Component
 
-## API
-
-### `createRenderSwitch`
-
-```ts
-import { createRenderSwitch } from "react-render-switch";
-
-type Case<P> = {
-  test: boolean | ((props: P) => boolean);
-  render: (props: P) => ReactNode;
-};
-
-type DefaultCase<P> = {
-  render: (props: P) => ReactNode;
-};
-```
-
-`createRenderSwitch(cases)` returns a renderer function. On each call:
-
-1. Cases are tested in object insertion order (`default` is skipped).
-2. The first truthy `test` runs its `render` and stops.
-3. If nothing matches: `default.render(props)` when provided, otherwise `null`.
-
-### `<RenderSwitch>`
-
-```ts
-import { RenderSwitch } from "react-render-switch";
-```
-
-For async query-style UI, pass boolean `states` and branch content as `ReactNode` props:
+`<RenderSwitch>` covers the async query pattern with boolean `states` and branch content as `ReactNode` props:
 
 ```tsx
+import { RenderSwitch } from "react-render-switch";
+
 <RenderSwitch
   states={{ isLoading, isError, isEmpty, isReady }}
   loading={<Loading />}
   error={<Error />}
   empty={<Empty />}
-  ready={<List data={data} />}
+  ready={<List data={data ?? []} />}
 />
 ```
 
-States are evaluated in order: loading → error → empty → ready. Returns `null` when no state matches.
+States are evaluated in order: loading → error → empty → ready. `empty` and `states.isEmpty` are paired — provide both or neither.
 
-`empty` and `states.isEmpty` are paired — provide both or neither. TypeScript rejects mismatched combinations.
+### Factory
 
-Branch props are plain `ReactNode`, so they are created on every render. Guard any data access in `ready` (e.g. `(data ?? []).map(...)`) rather than assuming the ready branch only runs when data exists.
+`createRenderSwitch` takes named cases and returns a renderer. Cases are tested in insertion order; the first matching `test` wins.
 
-## Usage
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { createRenderSwitch } from "react-render-switch";
 
-### Hook-driven state (rebuild each render)
+function TodoList() {
+  const { data, isLoading, isError, isSuccess } = useQuery({
+    queryKey: ["todos"],
+    queryFn: fetchTodos,
+  });
 
-Create the switch inside your component so boolean `test` values stay in sync with hook state:
+  const renderState = createRenderSwitch({
+    loading: { test: isLoading, render: () => <p>Loading…</p> },
+    error: { test: isError, render: () => <p>Failed to load todos</p> },
+    empty: {
+      test: data !== undefined && data.length === 0,
+      render: () => <p>No todos yet</p>,
+    },
+    ready: {
+      test: isSuccess,
+      render: () => (
+        <ul>
+          {data!.map((todo) => (
+            <li key={todo.id}>{todo.title}</li>
+          ))}
+        </ul>
+      ),
+    },
+  });
+
+  return renderState();
+}
+```
+
+Cases aren't limited to query states — add as many as you need. For example, a `searching` branch when the user has typed a query:
 
 ```tsx
 const renderState = createRenderSwitch({
   loading: { test: isLoading, render: () => <Loading /> },
-  error: { test: isError, render: () => <Error /> },
-  empty: { test: !query.data?.length, render: () => <Empty /> },
-  ready: { test: isReady, render: () => <List data={query.data} /> },
+  searching: {
+    test: searchQuery.length > 0,
+    render: () => <FilteredList query={searchQuery} items={data} />,
+  },
+  ready: {
+    test: isSuccess,
+    render: () => <FullList items={data} />,
+  },
 });
-
-return <div>{renderState()}</div>;
 ```
 
-### Render props (stable factory)
-
-Create once (module scope or `useMemo`) and pass props at call time. Use function `test` values so conditions are evaluated when props change:
+For a stable factory (module scope or `useMemo`), pass props at call time and use function tests so conditions stay fresh:
 
 ```tsx
 const renderState = createRenderSwitch<ChildProps>({
-  loading: { test: isLoading, render: () => <Loading /> },
+  loading: {
+    test: (props) => props.isLoading,
+    render: () => <Loading />,
+  },
   ready: {
     test: (props) => props.items.length > 0,
     render: (props) => <List {...props} />,
@@ -101,36 +101,92 @@ const renderState = createRenderSwitch<ChildProps>({
 return <Component>{(props) => renderState(props)}</Component>;
 ```
 
-### Optional default
+## API
 
-Omit `default` to return `null` when no case matches:
-
-```tsx
-const renderState = createRenderSwitch({
-  loading: { test: isLoading, render: () => <Loading /> },
-  ready: { test: isReady, render: () => <Content /> },
-});
-```
-
-## Config lifetime
-
-| Pattern | When to use | `test` form |
-|---|---|---|
-| Rebuild each render | Hook-driven state inside a component | `test: isLoading` (boolean) |
-| Stable factory | Static config, props change at call time | `test: (props) => ...` or `test: () => isLoading` |
-
-Boolean tests are evaluated when the renderer runs, not when the config is created. If you create the config once and rely on closed-over variables, use a function test so values stay fresh.
-
-## Case order
-
-Cases are evaluated in object insertion order. Avoid building case objects with spreads that could reorder keys:
+### `createRenderSwitch`
 
 ```ts
-// Avoid — order may not match intent
-createRenderSwitch({ ...baseCases, ...overrides });
+createRenderSwitch<P = void>(cases: Cases<P>): (props: P) => ReactNode
 ```
 
-Define cases inline in the order you want them tested.
+```ts
+type Case<P> = {
+  test: boolean | ((props: P) => boolean);
+  render: (props: P) => ReactNode;
+};
+
+type DefaultCase<P> = {
+  render: (props: P) => ReactNode;
+};
+
+type Cases<P> = Record<string, Case<P>> & {
+  default?: DefaultCase<P>;
+};
+```
+
+| Option | Description |
+| --- | --- |
+| `test` | Boolean or `(props) => boolean`. First truthy case wins. |
+| `render` | `(props) => ReactNode` for the matched case. |
+| `default` | Optional fallback when no case matches. Without it, returns `null`. |
+
+Notes:
+
+- Cases run in object insertion order (`default` is skipped during matching).
+- Boolean `test` values are read when the renderer runs. For a stable config, prefer function tests so closed-over values stay fresh.
+- Avoid spreading case objects (`{ ...base, ...overrides }`) — key order may not match your intent.
+
+### `<RenderSwitch>`
+
+```ts
+type RenderSwitchStatesWithEmpty = {
+  isLoading: boolean;
+  isError: boolean;
+  isEmpty: boolean;
+  isReady: boolean;
+};
+
+type RenderSwitchStatesWithoutEmpty = {
+  isLoading: boolean;
+  isError: boolean;
+  isReady: boolean;
+  isEmpty?: never;
+};
+
+type RenderSwitchProps =
+  | {
+      states: RenderSwitchStatesWithoutEmpty;
+      loading: ReactNode;
+      error: ReactNode;
+      ready: ReactNode;
+      empty?: never;
+    }
+  | {
+      states: RenderSwitchStatesWithEmpty;
+      loading: ReactNode;
+      error: ReactNode;
+      empty: ReactNode;
+      ready: ReactNode;
+    };
+```
+
+| Prop | Description |
+| --- | --- |
+| `states` | Booleans for the active branch. Order: loading → error → empty → ready. |
+| `loading` / `error` / `ready` | Required branch content. |
+| `empty` | Optional. Required (with `states.isEmpty`) when showing an empty state. |
+
+Branch props are plain `ReactNode`, so they are created every render. Guard data access in `ready` (e.g. `(data ?? []).map(...)`) rather than assuming that branch only mounts when data exists.
+
+## Develop
+
+```bash
+bun install
+bun run build
+bun test
+bun run example:factory
+bun run example:component
+```
 
 ## License
 
