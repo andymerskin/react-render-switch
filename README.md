@@ -1,6 +1,6 @@
 # react-render-switch
 
-Switch-style UI branching for React components. Define named cases with a `test` and `render`; `createRenderSwitch` evaluates them in object insertion order and returns the first match.
+Switch-style UI branching for React components. Define named cases with a `test` and `render` via `createRenderSwitch`, or use the `<RenderSwitch>` component for the common async loading/error/empty/ready pattern.
 
 ## Install
 
@@ -16,9 +16,13 @@ Requires React 18+ as a peer dependency.
 bun install
 bun run build
 bun test
+bun run example:factory
+bun run example:component
 ```
 
 ## API
+
+### `createRenderSwitch`
 
 ```ts
 import { createRenderSwitch } from "react-render-switch";
@@ -38,6 +42,30 @@ type DefaultCase<P> = {
 1. Cases are tested in object insertion order (`default` is skipped).
 2. The first truthy `test` runs its `render` and stops.
 3. If nothing matches: `default.render(props)` when provided, otherwise `null`.
+
+### `<RenderSwitch>`
+
+```ts
+import { RenderSwitch } from "react-render-switch";
+```
+
+For async query-style UI, pass boolean `states` and branch content as `ReactNode` props:
+
+```tsx
+<RenderSwitch
+  states={{ isLoading, isError, isEmpty, isReady }}
+  loading={<Loading />}
+  error={<Error />}
+  empty={<Empty />}
+  ready={<List data={data} />}
+/>
+```
+
+States are evaluated in order: loading → error → empty → ready. Returns `null` when no state matches.
+
+`empty` and `states.isEmpty` are paired — provide both or neither. TypeScript rejects mismatched combinations.
+
+Branch props are plain `ReactNode`, so they are created on every render. Guard any data access in `ready` (e.g. `(data ?? []).map(...)`) rather than assuming the ready branch only runs when data exists.
 
 ## Usage
 

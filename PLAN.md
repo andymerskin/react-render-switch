@@ -8,7 +8,7 @@
 | No match | Optional `default` case; returns `null` when omitted |
 | React | React-only; `react` peer dependency; returns `ReactNode` |
 | Case order | Object insertion order (`Record<string, Case>`) |
-| Export name | `createRenderSwitch` only |
+| Export name | `createRenderSwitch` and `RenderSwitch` |
 | Config lifetime | Support both rebuild-each-render and stable factory; document tradeoffs |
 | v1 scope | Render-only (no generic `match`/`run` core) |
 
@@ -75,14 +75,38 @@ const renderState = createRenderSwitch<ChildProps>({
 return <Component>{(props) => renderState(props)}</Component>;
 ```
 
+### `<RenderSwitch>` component
+
+For the common async query pattern (loading, error, empty, ready), use the component with a `states` object and branch props:
+
+```tsx
+import { RenderSwitch } from "react-render-switch";
+
+<RenderSwitch
+  states={{ isLoading, isError, isEmpty, isReady }}
+  loading={<Loading />}
+  error={<Error />}
+  empty={<Empty />}
+  ready={<List data={data} />}
+/>
+```
+
+Match order: loading → error → empty → ready. Returns `null` when no state matches.
+
+Omit `empty` and `states.isEmpty` together, or provide both — TypeScript enforces the pairing via a discriminated union.
+
 ## Project structure
 
 - `package.json` — ESM, `react` peer dep, Bun for package management and tests
 - `tsconfig.json` — strict mode
 - `src/types.ts` — `Case`, `DefaultCase`, `Cases`
 - `src/createRenderSwitch.ts` — core loop (`for...of Object.entries`, skip `default`, break on first match)
-- `src/index.ts` — re-export `createRenderSwitch` and types
+- `src/RenderSwitch.tsx` — async-state component wrapping `createRenderSwitch`
+- `src/index.ts` — re-export `createRenderSwitch`, `RenderSwitch`, and types
 - `tests/createRenderSwitch.test.ts`
+- `tests/RenderSwitch.test.ts`
+- `examples/factory/` — `createRenderSwitch` demo
+- `examples/component/` — `<RenderSwitch>` demo
 - `README.md` — API, examples, config-lifetime guidance, warning against spreading case objects
 
 ## TypeScript strategy
@@ -113,7 +137,7 @@ return <Component>{(props) => renderState(props)}</Component>;
 
 ## Success criteria
 
-- `createRenderSwitch` exported with optional `default` case; `null` when omitted
+- `createRenderSwitch` and `RenderSwitch` exported with optional `default` case; `null` when omitted
 - First-match semantics with object insertion order
 - Boolean and function `test` both work
 - Props inference or explicit generic for render-props
