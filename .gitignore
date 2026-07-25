@@ -1,2 +1,37 @@
+# Dependencies
 node_modules/
+
+# Build
 dist/
+*.tsbuildinfo
+
+# Coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Caches / tooling
+.cache/
+.turbo/
+.vite/
+*.local
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Test / misc
+*.tgz

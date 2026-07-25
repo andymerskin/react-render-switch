@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.svg" alt="react-render-switch" width="72" height="72" />
+</p>
+
 # react-render-switch
 
 Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<RenderSwitch>` for the common loading / error / empty / ready pattern.
@@ -9,6 +13,28 @@ bun add react-render-switch
 ```
 
 Requires React 18+ as a peer dependency.
+
+## Examples
+
+Runnable demos live in `examples/`. From the repo root:
+
+**Component** — async loading/error/empty/ready with `<RenderSwitch>`.
+
+```bash
+bun run example:component
+```
+
+**Factory** — the same query flow with `createRenderSwitch` inside a component.
+
+```bash
+bun run example:factory
+```
+
+**Custom states** — a contacts list with `selected`, `searching`, and `browsing` branches.
+
+```bash
+bun run example:custom-states
+```
 
 ## Usage
 
@@ -184,8 +210,6 @@ Branch props are plain `ReactNode`, so they are created every render. Guard data
 bun install
 bun run build
 bun test
-bun run example:factory
-bun run example:component
 ```
 
 ## License

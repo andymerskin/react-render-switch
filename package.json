@@ -18,6 +18,7 @@
     "build": "tsc",
     "example:factory": "bun --cwd examples/factory dev",
     "example:component": "bun --cwd examples/component dev",
+    "example:custom-states": "bun --cwd examples/custom-states dev",
     "test": "bun test",
     "test:watch": "bun test --watch"
   },

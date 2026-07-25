@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="react-render-switch">
+  <g
+    fill="none"
+    stroke="#111"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <!-- Handle -->
+    <path d="M32 58 V34" />
+    <!-- Crossbar -->
+    <path d="M18 34 H46" />
+    <!-- Three prongs -->
+    <path d="M18 34 V16" />
+    <path d="M32 34 V12" />
+    <path d="M46 34 V16" />
+    <!-- Outer prong flares -->
+    <path d="M18 16 L10 10" />
+    <path d="M46 16 L54 10" />
+  </g>
+</svg>
