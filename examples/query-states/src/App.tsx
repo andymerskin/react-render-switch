@@ -1,4 +1,4 @@
-import { createRenderSwitch } from "render-switch";
+import { createRenderSwitch } from "react-render-switch";
 
 import { QueryControls } from "./QueryControls";
 import { useFakeQuery } from "./useFakeQuery";

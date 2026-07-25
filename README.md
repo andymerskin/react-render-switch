@@ -1,11 +1,11 @@
-# render-switch
+# react-render-switch
 
-Ordered first-match UI control flow for React. Define named cases with a `test` and `render`; `createRenderSwitch` evaluates them in object insertion order and returns the first match.
+Switch-style UI branching for React components. Define named cases with a `test` and `render`; `createRenderSwitch` evaluates them in object insertion order and returns the first match.
 
 ## Install
 
 ```bash
-bun add render-switch
+bun add react-render-switch
 ```
 
 Requires React 18+ as a peer dependency.
@@ -21,7 +21,7 @@ bun test
 ## API
 
 ```ts
-import { createRenderSwitch } from "render-switch";
+import { createRenderSwitch } from "react-render-switch";
 
 type Case<P> = {
   test: boolean | ((props: P) => boolean);

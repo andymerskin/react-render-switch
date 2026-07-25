@@ -1,4 +1,4 @@
-# render-switch library plan
+# react-render-switch library plan
 
 ## Decisions (locked)
 

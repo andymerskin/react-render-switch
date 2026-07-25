@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "render-switch",
+      "name": "react-render-switch",
       "devDependencies": {
         "@types/bun": "latest",
         "@types/react": "^19.1.8",

@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "render-switch": path.resolve(__dirname, "../../src/index.ts"),
+      "react-render-switch": path.resolve(__dirname, "../../src/index.ts"),
     },
   },
 });
