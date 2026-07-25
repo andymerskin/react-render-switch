@@ -1,51 +1,50 @@
 import { describe, expect, it } from "bun:test";
 
-import { RenderSwitch } from "../src/RenderSwitch.tsx";
-import type { RenderSwitchProps } from "../src/RenderSwitch.tsx";
+import { AsyncSwitch } from "../src/AsyncSwitch.tsx";
+import type { AsyncSwitchProps } from "../src/AsyncSwitch.tsx";
 
 const baseProps = {
   loading: "loading",
   error: "error",
-  ready: "ready",
+  children: "ready",
 } as const;
 
-describe("RenderSwitch", () => {
+describe("AsyncSwitch", () => {
   it("renders loading when isLoading is true", () => {
-    const result = RenderSwitch({
+    const result = AsyncSwitch({
       ...baseProps,
-      states: { isLoading: true, isError: false, isReady: false },
+      states: { isLoading: true, isError: false },
     });
 
     expect(result).toBe("loading");
   });
 
   it("renders error when isError is true and isLoading is false", () => {
-    const result = RenderSwitch({
+    const result = AsyncSwitch({
       ...baseProps,
-      states: { isLoading: false, isError: true, isReady: false },
+      states: { isLoading: false, isError: true },
     });
 
     expect(result).toBe("error");
   });
 
   it("prefers loading over error when both are true", () => {
-    const result = RenderSwitch({
+    const result = AsyncSwitch({
       ...baseProps,
-      states: { isLoading: true, isError: true, isReady: false },
+      states: { isLoading: true, isError: true },
     });
 
     expect(result).toBe("loading");
   });
 
   it("renders empty when isEmpty is true and higher-priority states are false", () => {
-    const result = RenderSwitch({
+    const result = AsyncSwitch({
       ...baseProps,
       empty: "empty",
       states: {
         isLoading: false,
         isError: false,
         isEmpty: true,
-        isReady: false,
       },
     });
 
@@ -53,111 +52,97 @@ describe("RenderSwitch", () => {
   });
 
   it("prefers error over empty when both are true", () => {
-    const result = RenderSwitch({
+    const result = AsyncSwitch({
       ...baseProps,
       empty: "empty",
       states: {
         isLoading: false,
         isError: true,
         isEmpty: true,
-        isReady: false,
       },
     });
 
     expect(result).toBe("error");
   });
 
-  it("renders ready when isReady is true and higher-priority states are false", () => {
-    const result = RenderSwitch({
+  it("renders children as the default when no other state matches", () => {
+    const result = AsyncSwitch({
       ...baseProps,
-      states: { isLoading: false, isError: false, isReady: true },
+      states: { isLoading: false, isError: false },
     });
 
     expect(result).toBe("ready");
   });
 
-  it("returns null when no state matches", () => {
-    const result = RenderSwitch({
-      ...baseProps,
-      states: { isLoading: false, isError: false, isReady: false },
-    });
-
-    expect(result).toBeNull();
-  });
-
   it("omits the empty branch when empty prop is not provided", () => {
-    const result = RenderSwitch({
+    const result = AsyncSwitch({
       ...baseProps,
-      states: { isLoading: false, isError: false, isReady: true },
+      states: { isLoading: false, isError: false },
     });
 
     expect(result).toBe("ready");
   });
 });
 
-describe("RenderSwitch types", () => {
+describe("AsyncSwitch types", () => {
   it("accepts paired empty and isEmpty", () => {
-    const props: RenderSwitchProps = {
+    const props: AsyncSwitchProps = {
       states: {
         isLoading: false,
         isError: false,
         isEmpty: false,
-        isReady: true,
       },
       loading: "loading",
       error: "error",
       empty: "empty",
-      ready: "ready",
+      children: "ready",
     };
 
-    expect(RenderSwitch(props)).toBe("ready");
+    expect(AsyncSwitch(props)).toBe("ready");
   });
 
   it("accepts props without empty", () => {
-    const props: RenderSwitchProps = {
+    const props: AsyncSwitchProps = {
       states: {
         isLoading: false,
         isError: false,
-        isReady: true,
       },
       loading: "loading",
       error: "error",
-      ready: "ready",
+      children: "ready",
     };
 
-    expect(RenderSwitch(props)).toBe("ready");
+    expect(AsyncSwitch(props)).toBe("ready");
   });
 
   it("rejects empty without isEmpty", () => {
     expectTypeOf<
-      RenderSwitchProps,
+      AsyncSwitchProps,
       {
         states: {
           isLoading: false;
           isError: false;
-          isReady: true;
         };
         loading: "loading";
         error: "error";
         empty: "empty";
-        ready: "ready";
+        children: "ready";
       }
     >().toEqualTypeOf<never>();
   });
 
   it("rejects isEmpty without empty", () => {
     expectTypeOf<
-      RenderSwitchProps,
+      AsyncSwitchProps,
       {
         states: {
           isLoading: false;
           isError: false;
           isEmpty: false;
-          isReady: true;
         };
         loading: "loading";
         error: "error";
-        ready: "ready";
+        children: "ready";
       }
     >().toEqualTypeOf<never>();
   });

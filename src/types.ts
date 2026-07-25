@@ -9,6 +9,7 @@ export type DefaultCase<P> = {
   render: (props: P) => ReactNode;
 };
 
-export type Cases<P> = Record<string, Case<P>> & {
+export type Cases<P> = {
+  [key: string]: Case<P> | DefaultCase<P> | undefined;
   default?: DefaultCase<P>;
 };

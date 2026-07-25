@@ -1,10 +1,8 @@
-<p align="center">
-  <img src="logo.svg" alt="react-render-switch" width="72" height="72" />
-</p>
+
 
 # react-render-switch
 
-Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<RenderSwitch>` for the common loading / error / empty / ready pattern.
+Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<AsyncSwitch>` for the common loading / error / empty pattern (ready content via `children`).
 
 ## Install
 
@@ -18,7 +16,7 @@ Requires React 18+ as a peer dependency.
 
 Runnable demos live in `examples/`. From the repo root:
 
-**Component** — async loading/error/empty/ready with `<RenderSwitch>`.
+**Component** — async loading/error/empty with `<AsyncSwitch>` (ready via `children`).
 
 ```bash
 bun run example:component
@@ -36,25 +34,30 @@ bun run example:factory
 bun run example:custom-states
 ```
 
+
+
 ## Usage
+
+
 
 ### Component
 
-`<RenderSwitch>` covers the async query pattern with boolean `states` and branch content as `ReactNode` props:
+`<AsyncSwitch>` covers the async query pattern with boolean `states` and branch content as `ReactNode` props:
 
 ```tsx
-import { RenderSwitch } from "react-render-switch";
+import { AsyncSwitch } from "react-render-switch";
 
-<RenderSwitch
-  states={{ isLoading, isError, isEmpty, isReady }}
+<AsyncSwitch
+  states={{ isLoading, isError, isEmpty }}
   loading={<Loading />}
   error={<Error />}
   empty={<Empty />}
-  ready={<List data={data ?? []} />}
-/>
+>
+  <List data={data ?? []} />
+</AsyncSwitch>
 ```
 
-States are evaluated in order: loading → error → empty → ready. `empty` and `states.isEmpty` are paired — provide both or neither.
+States are evaluated in order: loading → error → empty. Renders `children` when async states aren't matching. `empty` state is optional.
 
 ### Factory
 
@@ -127,7 +130,11 @@ const renderState = createRenderSwitch<ChildProps>({
 return <Component>{(props) => renderState(props)}</Component>;
 ```
 
+
+
 ## API
+
+
 
 ### `createRenderSwitch`
 
@@ -145,16 +152,19 @@ type DefaultCase<P> = {
   render: (props: P) => ReactNode;
 };
 
-type Cases<P> = Record<string, Case<P>> & {
+type Cases<P> = {
+  [key: string]: Case<P> | DefaultCase<P> | undefined;
   default?: DefaultCase<P>;
 };
 ```
 
-| Option | Description |
-| --- | --- |
-| `test` | Boolean or `(props) => boolean`. First truthy case wins. |
-| `render` | `(props) => ReactNode` for the matched case. |
+
+| Option    | Description                                                         |
+| --------- | ------------------------------------------------------------------- |
+| `test`    | Boolean or `(props) => boolean`. First truthy case wins.            |
+| `render`  | `(props) => ReactNode` for the matched case.                        |
 | `default` | Optional fallback when no case matches. Without it, returns `null`. |
+
 
 Notes:
 
@@ -162,47 +172,50 @@ Notes:
 - Boolean `test` values are read when the renderer runs. For a stable config, prefer function tests so closed-over values stay fresh.
 - Avoid spreading case objects (`{ ...base, ...overrides }`) — key order may not match your intent.
 
-### `<RenderSwitch>`
+
+
+### `<AsyncSwitch>`
 
 ```ts
-type RenderSwitchStatesWithEmpty = {
+type AsyncSwitchStatesWithEmpty = {
   isLoading: boolean;
   isError: boolean;
   isEmpty: boolean;
-  isReady: boolean;
 };
 
-type RenderSwitchStatesWithoutEmpty = {
+type AsyncSwitchStatesWithoutEmpty = {
   isLoading: boolean;
   isError: boolean;
-  isReady: boolean;
   isEmpty?: never;
 };
 
-type RenderSwitchProps =
+type AsyncSwitchProps =
   | {
-      states: RenderSwitchStatesWithoutEmpty;
+      states: AsyncSwitchStatesWithoutEmpty;
       loading: ReactNode;
       error: ReactNode;
-      ready: ReactNode;
+      children: ReactNode;
       empty?: never;
     }
   | {
-      states: RenderSwitchStatesWithEmpty;
+      states: AsyncSwitchStatesWithEmpty;
       loading: ReactNode;
       error: ReactNode;
       empty: ReactNode;
-      ready: ReactNode;
+      children: ReactNode;
     };
 ```
 
-| Prop | Description |
-| --- | --- |
-| `states` | Booleans for the active branch. Order: loading → error → empty → ready. |
-| `loading` / `error` / `ready` | Required branch content. |
-| `empty` | Optional. Required (with `states.isEmpty`) when showing an empty state. |
 
-Branch props are plain `ReactNode`, so they are created every render. Guard data access in `ready` (e.g. `(data ?? []).map(...)`) rather than assuming that branch only mounts when data exists.
+| Prop                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| `states`            | Booleans for the active branch. Order: loading → error → empty.         |
+| `loading` / `error` | Required branch content.                                                |
+| `children`          | Default content when no other state matches.                            |
+| `empty`             | Optional. Required (with `states.isEmpty`) when showing an empty state. |
+
+
+Branch props are plain `ReactNode`, so they are created every render. Guard data access in `children` (e.g. `(data ?? []).map(...)`) rather than assuming that branch only mounts when data exists.
 
 ## Develop
 
@@ -211,6 +224,8 @@ bun install
 bun run build
 bun test
 ```
+
+
 
 ## License
 

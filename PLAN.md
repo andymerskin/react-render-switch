@@ -8,7 +8,7 @@
 | No match | Optional `default` case; returns `null` when omitted |
 | React | React-only; `react` peer dependency; returns `ReactNode` |
 | Case order | Object insertion order (`Record<string, Case>`) |
-| Export name | `createRenderSwitch` and `RenderSwitch` |
+| Export name | `createRenderSwitch` and `AsyncSwitch` |
 | Config lifetime | Support both rebuild-each-render and stable factory; document tradeoffs |
 | v1 scope | Render-only (no generic `match`/`run` core) |
 
@@ -24,7 +24,8 @@ type DefaultCase<P> = {
   render: (props: P) => ReactNode;
 };
 
-type Cases<P> = Record<string, Case<P>> & {
+type Cases<P> = {
+  [key: string]: Case<P> | DefaultCase<P> | undefined;
   default?: DefaultCase<P>;
 };
 
@@ -75,23 +76,24 @@ const renderState = createRenderSwitch<ChildProps>({
 return <Component>{(props) => renderState(props)}</Component>;
 ```
 
-### `<RenderSwitch>` component
+### `<AsyncSwitch>` component
 
 For the common async query pattern (loading, error, empty, ready), use the component with a `states` object and branch props:
 
 ```tsx
-import { RenderSwitch } from "react-render-switch";
+import { AsyncSwitch } from "react-render-switch";
 
-<RenderSwitch
-  states={{ isLoading, isError, isEmpty, isReady }}
+<AsyncSwitch
+  states={{ isLoading, isError, isEmpty }}
   loading={<Loading />}
   error={<Error />}
   empty={<Empty />}
-  ready={<List data={data} />}
-/>
+>
+  <List data={data} />
+</AsyncSwitch>
 ```
 
-Match order: loading → error → empty → ready. Returns `null` when no state matches.
+Match order: loading → error → empty. `children` is the default when none match.
 
 Omit `empty` and `states.isEmpty` together, or provide both — TypeScript enforces the pairing via a discriminated union.
 
@@ -101,12 +103,12 @@ Omit `empty` and `states.isEmpty` together, or provide both — TypeScript enfor
 - `tsconfig.json` — strict mode
 - `src/types.ts` — `Case`, `DefaultCase`, `Cases`
 - `src/createRenderSwitch.ts` — core loop (`for...of Object.entries`, skip `default`, break on first match)
-- `src/RenderSwitch.tsx` — async-state component wrapping `createRenderSwitch`
-- `src/index.ts` — re-export `createRenderSwitch`, `RenderSwitch`, and types
+- `src/AsyncSwitch.tsx` — async-state component wrapping `createRenderSwitch`
+- `src/index.ts` — re-export `createRenderSwitch`, `AsyncSwitch`, and types
 - `tests/createRenderSwitch.test.ts`
-- `tests/RenderSwitch.test.ts`
+- `tests/AsyncSwitch.test.ts`
 - `examples/factory/` — `createRenderSwitch` demo
-- `examples/component/` — `<RenderSwitch>` demo
+- `examples/component/` — `<AsyncSwitch>` demo
 - `README.md` — API, examples, config-lifetime guidance, warning against spreading case objects
 
 ## TypeScript strategy
@@ -137,7 +139,7 @@ Omit `empty` and `states.isEmpty` together, or provide both — TypeScript enfor
 
 ## Success criteria
 
-- `createRenderSwitch` and `RenderSwitch` exported with optional `default` case; `null` when omitted
+- `createRenderSwitch` and `AsyncSwitch` exported with optional `default` case; `null` when omitted
 - First-match semantics with object insertion order
 - Boolean and function `test` both work
 - Props inference or explicit generic for render-props
