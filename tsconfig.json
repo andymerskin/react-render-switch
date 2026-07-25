@@ -16,7 +16,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["bun"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "tests"]
