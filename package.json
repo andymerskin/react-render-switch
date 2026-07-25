@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "example": "bun --cwd examples/query-states dev",
+    "example:factory": "bun --cwd examples/factory dev",
+    "example:component": "bun --cwd examples/component dev",
     "test": "bun test",
     "test:watch": "bun test --watch"
   },
