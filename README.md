@@ -14,10 +14,27 @@ Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, 
 
 ## Installation
 
-```bash
+**npm**
+
+```shell
 npm install react-render-switch
+```
+
+**pnpm**
+
+```shell
 pnpm add react-render-switch
+```
+
+**Yarn**
+
+```shell
 yarn add react-render-switch
+```
+
+**Bun**
+
+```shell
 bun add react-render-switch
 ```
 
@@ -29,19 +46,19 @@ Runnable demos live in `examples/`. From the repo root:
 
 **Component** — async loading/error/empty with `<AsyncSwitch>` (ready via `children`).
 
-```bash
+```shell
 bun run example:component
 ```
 
 **Factory** — the same query flow with `createRenderSwitch` inside a component.
 
-```bash
+```shell
 bun run example:factory
 ```
 
 **Custom states** — a contacts list with `selected`, `searching`, and `browsing` branches.
 
-```bash
+```shell
 bun run example:custom-states
 ```
 
