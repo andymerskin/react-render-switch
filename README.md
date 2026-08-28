@@ -1,10 +1,18 @@
-# react-render-switch
+<p align="center">
+  <img src="./logo.svg" width="160" alt="react-render-switch" />
+</p>
 
-Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<AsyncSwitch>` for the common loading / error / empty pattern (ready content via `children`).
+<h1 align="center">react-render-switch</h1>
 
-[![npm](https://img.shields.io/npm/v/react-render-switch)](https://www.npmjs.com/package/react-render-switch)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/react-render-switch)](https://bundlephobia.com/package/react-render-switch)
-[![CI](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml/badge.svg)](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml)
+<p align="center">
+  Switch-style UI branching for React. Use <code>createRenderSwitch</code> for custom cases, or <code>&lt;AsyncSwitch&gt;</code> for the common loading / error / empty pattern (ready content via <code>children</code>).
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/react-render-switch"><img src="https://img.shields.io/npm/v/react-render-switch" alt="npm" /></a>
+  <a href="https://bundlephobia.com/package/react-render-switch"><img src="https://img.shields.io/bundlephobia/minzip/react-render-switch" alt="bundle size" /></a>
+  <a href="https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml"><img src="https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+</p>
 
 ## Features
 
