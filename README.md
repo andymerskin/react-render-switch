@@ -2,9 +2,9 @@
 
 Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<AsyncSwitch>` for the common loading / error / empty pattern (ready content via `children`).
 
-[![CI](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml/badge.svg)](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml)
-[![GitHub release](https://img.shields.io/github/v/release/andymerskin/react-render-switch)](https://github.com/andymerskin/react-render-switch/releases/latest)
 [![npm](https://img.shields.io/npm/v/react-render-switch)](https://www.npmjs.com/package/react-render-switch)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/react-render-switch)](https://bundlephobia.com/package/react-render-switch)
+[![CI](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml/badge.svg)](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml)
 
 ## Features
 
