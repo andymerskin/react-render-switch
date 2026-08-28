@@ -268,3 +268,7 @@ bun test
 ## License
 
 MIT
+
+## Credits
+
+Logo is [Trident Emblem](https://icon-sets.iconify.design/fluent-emoji-flat/trident-emblem/) from Microsoft [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (MIT), via [Iconify](https://iconify.design).
