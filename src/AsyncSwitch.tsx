@@ -31,28 +31,15 @@ export type AsyncSwitchProps =
     });
 
 export function AsyncSwitch(props: AsyncSwitchProps): ReactNode {
-  if ("empty" in props && props.empty !== undefined) {
-    const { states, loading, error, children, empty } = props;
-    const { isLoading, isError, isEmpty } = states;
-
-    const renderState = createRenderSwitch({
-      loading: { test: isLoading, render: () => loading },
-      error: { test: isError, render: () => error },
-      empty: { test: isEmpty, render: () => empty },
-      default: { render: () => children },
-    });
-
-    return renderState();
-  }
-
   const { states, loading, error, children } = props;
-  const { isLoading, isError } = states;
+  const empty = "empty" in props ? props.empty : undefined;
 
-  const renderState = createRenderSwitch({
-    loading: { test: isLoading, render: () => loading },
-    error: { test: isError, render: () => error },
+  return createRenderSwitch({
+    loading: { test: states.isLoading, render: () => loading },
+    error: { test: states.isError, render: () => error },
+    ...(empty !== undefined && {
+      empty: { test: states.isEmpty === true, render: () => empty },
+    }),
     default: { render: () => children },
-  });
-
-  return renderState();
+  })();
 }
