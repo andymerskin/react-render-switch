@@ -38,15 +38,17 @@ jobs:
         run: bun test
 
       - name: Extract changelog for release
-        id: changelog
         run: |
           TAG="${{ github.event.release.tag_name }}"
           VERSION="${TAG#v}"
           awk -v ver="$VERSION" '
-            BEGIN { found=0 }
+            BEGIN { found=0; heading="[" ver "]" }
             /^## \[/ {
               if (found) exit
-              if ($0 ~ "\\[" ver "\\]") found=1
+              if (index($0, heading) > 0) {
+                found=1
+                print
+              }
               next
             }
             found { print }
@@ -68,7 +70,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
 
       - name: Upgrade npm for OIDC trusted publishing
         run: npm install -g npm@latest
@@ -78,13 +79,24 @@ jobs:
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
-          if npm view "react-render-switch@${VERSION}" version 2>/dev/null; then
+          OUTPUT=""
+          STATUS=0
+          OUTPUT=$(npm view "react-render-switch@${VERSION}" version 2>&1) || STATUS=$?
+
+          if [ "$STATUS" -eq 0 ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "Version already published to npm; skipping publish."
-          else
+          elif echo "$OUTPUT" | grep -qiE 'E404|404 Not Found|not found'; then
             echo "exists=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$OUTPUT"
+            exit 1
           fi
 
       - name: Publish to npm
-        if: steps.npm-check.outputs.exists != 'true'
+        if: steps.npm-check.outputs.exists != 'true' && !github.event.release.prerelease
         run: npm publish
+
+      - name: Skip npm publish for pre-releases
+        if: github.event.release.prerelease
+        run: echo "Pre-release; skipping npm publish."
