@@ -1,12 +1,23 @@
-
-
 # react-render-switch
 
 Switch-style UI branching for React. Use `createRenderSwitch` for custom cases, or `<AsyncSwitch>` for the common loading / error / empty pattern (ready content via `children`).
 
-## Install
+[![CI](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml/badge.svg)](https://github.com/andymerskin/react-render-switch/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/andymerskin/react-render-switch)](https://github.com/andymerskin/react-render-switch/releases/latest)
+[![npm](https://img.shields.io/npm/v/react-render-switch)](https://www.npmjs.com/package/react-render-switch)
+
+## Features
+
+- **Named cases** — match UI states in insertion order with `createRenderSwitch`
+- **Async branches** — loading, error, and empty via `<AsyncSwitch>`, ready content as `children`
+- **Typed API** — TypeScript types for cases, props, and async state variants
+
+## Installation
 
 ```bash
+npm install react-render-switch
+pnpm add react-render-switch
+yarn add react-render-switch
 bun add react-render-switch
 ```
 
@@ -218,6 +229,8 @@ type AsyncSwitchProps =
 Branch props are plain `ReactNode`, so they are created every render. Guard data access in `children` (e.g. `(data ?? []).map(...)`) rather than assuming that branch only mounts when data exists.
 
 ## Develop
+
+This repo uses [Bun](https://bun.sh) for local development.
 
 ```bash
 bun install
